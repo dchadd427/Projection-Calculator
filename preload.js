@@ -10,5 +10,6 @@ if (
     maximize: () => ipcRenderer.send("window-maximize"),
     close: () => ipcRenderer.send("window-close"),
     exitApp: () => ipcRenderer.send("window-close"),
+    openDevTools: () => ipcRenderer.send("open-devtools"), // Add this line for devtools
   });
 }
