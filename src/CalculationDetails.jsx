@@ -16,7 +16,6 @@ export default function CalculationDetails({
 }) {
   return (
     <>
-      <h3>Calculation</h3>
       <ul>
         <li>Projector Aspect: {aspect.toFixed(2)}</li>
         <li>Image Width (ft): {imageWidthFt.toFixed(2)}</li>

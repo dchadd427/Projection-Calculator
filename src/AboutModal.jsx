@@ -1,5 +1,3 @@
-import React from "react";
-
 // AboutModal: Modal dialog with app info
 export default function AboutModal({ onClose }) {
   return (

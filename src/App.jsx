@@ -5,7 +5,6 @@ import ProjectorError from "./ProjectorError";
 import CalculationDetails from "./CalculationDetails";
 import ProjectorVisualization from "./ProjectorVisualization";
 import AboutModal from "./AboutModal";
-import ZoomBar from "./ZoomBar";
 import "./App.css";
 
 // Main App: Handles state, calculation, and layout for the projection calculator
@@ -17,11 +16,6 @@ export default function App() {
   const [manualNumProjectors, setManualNumProjectors] = useState("");
   const [showAbout, setShowAbout] = useState(false);
   const [showCalc, setShowCalc] = useState(false);
-
-  // Zoom state
-  const [zoom, setZoom] = useState(1);
-  const minZoom = 0.5;
-  const maxZoom = 2;
 
   // Pan state for visualization
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -104,34 +98,6 @@ export default function App() {
     setManualNumProjectors("");
   }, [screen.widthFt, screen.heightFt, projector.width, projector.height]);
 
-  // Handle zoom slider
-  const handleZoomChange = (value) => {
-    setZoom(Number(value));
-  };
-
-  // Handle mouse wheel zoom
-  useEffect(() => {
-    const handleWheel = (e) => {
-      if (
-        !svgContainerRef.current ||
-        !svgContainerRef.current.contains(e.target)
-      )
-        return;
-      if (e.ctrlKey) return; // Let browser zoom with ctrl+wheel
-      e.preventDefault();
-      const delta = e.deltaY < 0 ? 0.05 : -0.05;
-      setZoom((z) =>
-        Math.min(maxZoom, Math.max(minZoom, +(z + delta).toFixed(2)))
-      );
-    };
-    const container = svgContainerRef.current;
-    if (container)
-      container.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
-      if (container) container.removeEventListener("wheel", handleWheel);
-    };
-  }, []);
-
   // Handler for File > Exit
   const handleExit = () => {
     if (window && window.close) {
@@ -146,51 +112,50 @@ export default function App() {
     <div className="app-root">
       <AppMenu onExit={handleExit} onAbout={() => setShowAbout(true)} />
       <div className="app-main">
-        <CalculatorForm
-          screen={screen}
-          setScreen={setScreen}
-          projector={projector}
-          setProjector={setProjector}
-          distanceFt={distanceFt}
-          setDistanceFt={setDistanceFt}
-          manualNumProjectors={manualNumProjectors}
-          setManualNumProjectors={setManualNumProjectors}
-          minNumProjectors={minNumProjectors}
-        />
-        {!canCover && (
-          <ProjectorError
-            numProjectors={numProjectors}
-            projector={projector}
-            totalPixelWidth={totalPixelWidth}
-            tooMuchOverlap={tooMuchOverlap}
-          />
-        )}
-        <button
-          className="toggle-calc-btn"
-          onClick={() => setShowCalc((v) => !v)}
-        >
-          {showCalc ? "Hide Calculation" : "Show Calculation"}
-        </button>
-        {showCalc && (
-          <CalculationDetails
-            aspect={aspect}
-            imageWidthFt={imageWidthFt}
-            pixelsPerFoot={pixelsPerFoot}
-            totalPixelWidth={totalPixelWidth}
-            minNumProjectors={minNumProjectors}
-            totalProjectorPixels={totalProjectorPixels}
-            blend={blend}
-            blendPerOverlap={blendPerOverlap}
-            projector={projector}
-            fullAspectRatio={fullAspectRatio}
-            lensRatio={lensRatio}
-          />
-        )}
-        <h3 className="vis-title">Projector Placement Visualization</h3>
+        <div className="main-row">
+          <div className="main-form-col">
+            <CalculatorForm
+              screen={screen}
+              setScreen={setScreen}
+              projector={projector}
+              setProjector={setProjector}
+              distanceFt={distanceFt}
+              setDistanceFt={setDistanceFt}
+              manualNumProjectors={manualNumProjectors}
+              setManualNumProjectors={setManualNumProjectors}
+              minNumProjectors={minNumProjectors}
+            />
+            {!canCover && (
+              <ProjectorError
+                numProjectors={numProjectors}
+                projector={projector}
+                totalPixelWidth={totalPixelWidth}
+                tooMuchOverlap={tooMuchOverlap}
+              />
+            )}
+          </div>
+          <div className="main-calc-col">
+            <div className="calc-scrollbox">
+              <CalculationDetails
+                aspect={aspect}
+                imageWidthFt={imageWidthFt}
+                pixelsPerFoot={pixelsPerFoot}
+                totalPixelWidth={totalPixelWidth}
+                minNumProjectors={minNumProjectors}
+                totalProjectorPixels={totalProjectorPixels}
+                blend={blend}
+                blendPerOverlap={blendPerOverlap}
+                projector={projector}
+                fullAspectRatio={fullAspectRatio}
+                lensRatio={lensRatio}
+              />
+            </div>
+          </div>
+        </div>
         <div className="vis-container" ref={svgContainerRef}>
           <div className="vis-svg-div">
             <ProjectorVisualization
-              visScale={visScale * zoom} // pass combined scale for transform
+              visScale={visScale}
               visScreenWidth={visScreenWidth}
               visScreenHeight={visScreenHeight}
               visProjWidth={visProjWidth}
@@ -206,12 +171,6 @@ export default function App() {
               overlapPx={overlapPx}
               blendPerOverlap={blendPerOverlap}
               distanceFt={distanceFt}
-            />
-            <ZoomBar
-              zoom={zoom}
-              minZoom={minZoom}
-              maxZoom={maxZoom}
-              onZoomChange={handleZoomChange}
             />
           </div>
         </div>
