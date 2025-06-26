@@ -4,7 +4,6 @@ import CalculatorForm from "./CalculatorForm";
 import ProjectorError from "./ProjectorError";
 import CalculationDetails from "./CalculationDetails";
 import ProjectorVisualization from "./ProjectorVisualization";
-import VisualizationLegend from "./VisualizationLegend";
 import AboutModal from "./AboutModal";
 import ZoomBar from "./ZoomBar";
 import "./App.css";
@@ -23,6 +22,9 @@ export default function App() {
   const [zoom, setZoom] = useState(1);
   const minZoom = 0.5;
   const maxZoom = 2;
+
+  // Pan state for visualization
+  const [pan, setPan] = useState({ x: 0, y: 0 });
 
   // Calculation logic for projection and blending
   const aspect = projector.width / projector.height;
@@ -86,7 +88,7 @@ export default function App() {
     return () => resizeObserver.disconnect();
   }, [screen.heightFt, distanceFt, visMinScale, visMaxScale]);
 
-  // Visualization dimensions
+  // Visualization dimensions (do NOT multiply by zoom)
   const visScreenWidth = visScale ? screen.widthFt * visScale : 0;
   const visScreenHeight = visScale ? screen.heightFt * visScale : 0;
   const visProjWidth = visScale
@@ -188,19 +190,20 @@ export default function App() {
         <div className="vis-container" ref={svgContainerRef}>
           <div className="vis-svg-div">
             <ProjectorVisualization
-              visScale={visScale * zoom}
-              visScreenWidth={visScreenWidth * zoom}
-              visScreenHeight={visScreenHeight * zoom}
-              visProjWidth={visProjWidth * zoom}
-              visProjHeight={visProjHeight * zoom}
-              visDistance={visDistance * zoom}
-              visPadding={visPadding * zoom}
-              pan={{ x: 0, y: 0 }}
+              visScale={visScale * zoom} // pass combined scale for transform
+              visScreenWidth={visScreenWidth}
+              visScreenHeight={visScreenHeight}
+              visProjWidth={visProjWidth}
+              visProjHeight={visProjHeight}
+              visDistance={visDistance}
+              visPadding={visPadding}
+              pan={pan}
+              setPan={setPan}
               screen={screen}
               projector={projector}
               canCover={canCover}
               numProjectors={numProjectors}
-              overlapPx={overlapPx * zoom}
+              overlapPx={overlapPx}
               blendPerOverlap={blendPerOverlap}
               distanceFt={distanceFt}
             />
@@ -212,7 +215,6 @@ export default function App() {
             />
           </div>
         </div>
-        <VisualizationLegend />
         {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
       </div>
     </div>

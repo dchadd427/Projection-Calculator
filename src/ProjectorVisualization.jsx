@@ -2,14 +2,12 @@ import React from "react";
 
 // ProjectorVisualization: Renders the SVG visualization of the projector setup
 export default function ProjectorVisualization({
-  visScale,
   visScreenWidth,
   visScreenHeight,
   visProjWidth,
   visProjHeight,
   visDistance,
   visPadding,
-  pan,
   screen,
   projector,
   canCover,
@@ -18,27 +16,34 @@ export default function ProjectorVisualization({
   blendPerOverlap,
   distanceFt,
 }) {
-  if (visScale == null) return null;
   // SVG height: screen + projector throw + padding
   const svgWidth = visScreenWidth + 40; // 20px padding left/right
   const svgHeight = visScreenHeight + visDistance + visPadding;
   // Projector Y position: below screen, at visScreenHeight + visDistance
   const projY = visScreenHeight + visDistance;
-  // Calculate zoom factor from visScale and props
-  // We want to apply zoom as a scale to the visualization group only
-  // so all coordinates and font sizes remain at base scale
-  const baseScale = visScale / (visScale * (1 / (visScale / (visScale || 1))));
-  const zoomFactor = svgWidth / (visScreenWidth + 40);
+
   return (
-    <svg
-      className="vis-svg"
-      width={svgWidth}
-      height={svgHeight}
-      viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-      style={{ display: "block", background: "#eee", borderRadius: 8 }}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: "100%",
+      }}
     >
-      <g transform={`translate(20,0)`}>
-        <g className="vis-zoom-group">
+      <svg
+        className="vis-svg"
+        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+        style={{
+          width: svgWidth,
+          height: svgHeight,
+          display: "block",
+          background: "#eee",
+          borderRadius: 8,
+        }}
+      >
+        <g transform="translate(20,0)">
           {/* Screen rectangle */}
           <rect
             x={0}
@@ -187,7 +192,7 @@ export default function ProjectorVisualization({
               );
             })}
         </g>
-      </g>
-    </svg>
+      </svg>
+    </div>
   );
 }
